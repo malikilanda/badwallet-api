@@ -32,7 +32,12 @@ public class PaymentServicesController {
         String phoneNumber = (String) body.get("phoneNumber");
         String serviceName = (String) body.get("serviceName");
         List<String> references = (List<String>) body.get("factureReferences");
+        Double totalAmount = Double.valueOf(body.get("totalAmount").toString());
+
         Wallet wallet = walletService.getWalletByPhone(phoneNumber);
+        if (wallet.getBalance() < totalAmount) throw new RuntimeException("Solde insuffisant");
+
+        walletService.enregistrerPaiement(wallet, totalAmount, serviceName);
         return ResponseEntity.ok(paymentServiceClient.payerFacturesSpecifiques(wallet.getCode(), serviceName, references));
     }
 }
